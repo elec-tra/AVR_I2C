@@ -1,0 +1,25 @@
+/*
+ * common_preprocessors.h
+ *
+ *  Created on: Oct 5, 2021
+ *      Author: saranyan
+ */
+
+#ifndef COMMON_PREPROCESSORS_H_
+#define COMMON_PREPROCESSORS_H_
+
+#define ENABLE 0
+#define DISABLE 1
+
+#define SET 0
+#define CLEAR 1
+
+#define HIGH 0
+#define LOW 1
+
+#define LEFT_SHIFT(BIT_POSITION) (1 << BIT_POSITION)
+#define SET_BIT(REGISTER, BIT_POSITION) REGISTER |= LEFT_SHIFT(BIT_POSITION)
+#define CLEAR_BIT(REGISTER, BIT_POSITION) REGISTER &= ~(LEFT_SHIFT(BIT_POSITION))
+#define TOGGLE_BIT(REGISTER, BIT_POSITION) REGISTER ^= LEFT_SHIFT(BIT_POSITION)
+
+#endif /* COMMON_PREPROCESSORS_H_ */
