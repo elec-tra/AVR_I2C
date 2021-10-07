@@ -2,16 +2,14 @@
  * usart0.c
  *
  *  Created on: Oct 6, 2021
- *      Author: linuxus
+ *      Author: saranyan
  */
 
 #include <avr/interrupt.h>
-#include <string.h>
 #include "common_preprocessors.h"
 #include "usart0.h"
 
 static char * data;
-static uint8_t no_of_chars;
 
 void USART0_Init(unsigned int ubrr)
 {
@@ -52,23 +50,19 @@ void USART0_Init(unsigned int ubrr)
 void USART0_Send_Data(char * _data)
 {
 	data = _data;
-	no_of_chars = strlen(data);
 	SET_BIT(UCSR0B, UDRIE0);			/*Enabled - Data Buffer Empty Interrupt*/
 }
 
 ISR(USART_UDRE_vect)
 {
-	static uint8_t temp;
-
-	if(temp < no_of_chars)
+	if(*data != '\0')
 	{
-		UDR0 = *(data + temp);
-		++temp;
+		UDR0 = *(data++);				/*Load Next Data Byte*/
 	}
 	else
 	{
-		CLEAR_BIT(UCSR0B, UDRIE0);			/*Disabled - Data Buffer Empty Interrupt*/
-		temp = 0;
+		UDR0 = '\n';
+		CLEAR_BIT(UCSR0B, UDRIE0);		/*Disabled - Data Buffer Empty Interrupt*/
 	}
 }
 

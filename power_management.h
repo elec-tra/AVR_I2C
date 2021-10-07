@@ -2,7 +2,7 @@
  * power_management.h
  *
  *  Created on: Oct 5, 2021
- *      Author: linuxus
+ *      Author: saranyan
  */
 
 #ifndef POWER_MANAGEMENT_H_

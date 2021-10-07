@@ -2,7 +2,7 @@
  * usart0.h
  *
  *  Created on: Oct 6, 2021
- *      Author: linuxus
+ *      Author: saranyan
  */
 
 #ifndef USART0_H_
