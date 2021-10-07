@@ -7,11 +7,11 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include <stdint.h>
 #include "common_preprocessors.h"
 #include "power_management.h"
 #include "usart0.h"
 #include "i2c.h"
+#include "general_utility_functions.h"
 
 /*I2C*/
 #define Slave_Address 0b1101000
@@ -34,25 +34,32 @@ int main(void)
 	CLEAR_BIT(PORTB, PB5);				/*Clear PB5 Bit*/
 	/*UART0*/
 	USART0_Init(MYUBRR);
-	/*I2C*/
-	I2C_Init();
 
 	/*Interrupt*/
 	SET_BIT(SREG, 7);					/*Enable Interrupt*/
 
 	/*USART0 Transmit Example*/
-	USART0_Send_Data("Serial Test Message...\n");
-	_delay_ms(10);
-
-	/*I2C Example*/
-	I2C_Start_Communication(Slave_Address);
+	USART0_Send_Data("Serial Test Message...");
+	_delay_ms(5);
 
 	//-----------Event loop----------//
 	while (1)
 	{
 		/*Blink LED Example*/
 		TOGGLE_BIT(PORTB, PB5);
-		_delay_ms(1000);
+
+		/*I2C Example*/
+		I2C_Init();
+		I2C_Start_Communication(Slave_Address);
+		_delay_ms(5000);
+		I2C_Stop_Communication();
+		char seconds[3];
+		Byte_to_HexChar((uint8_t) (data_buffer[0] >> 4), debug_message);
+		seconds[0] = debug_message[0];
+		Byte_to_HexChar((uint8_t) (data_buffer[0] & 0b00001111), debug_message);
+		seconds[1] = debug_message[0];
+		seconds[2] = '\0';
+		USART0_Send_Data(seconds);
 	}
 	return(0);
 }

@@ -4,16 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../general_utility_functions.c \
 ../i2c.c \
 ../main.c \
 ../usart0.c 
 
 OBJS += \
+./general_utility_functions.o \
 ./i2c.o \
 ./main.o \
 ./usart0.o 
 
 C_DEPS += \
+./general_utility_functions.d \
 ./i2c.d \
 ./main.d \
 ./usart0.d 
