@@ -10,6 +10,6 @@
 
 //-----Function Declarations------//
 void USART0_Init(unsigned int ubrr);
-void USART0_Send_Data(char * _data);
+void USART0_Send_Data(register char * _data);
 
 #endif /* USART0_H_ */
