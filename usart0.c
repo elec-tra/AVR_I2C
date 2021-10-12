@@ -9,7 +9,8 @@
 #include "common_preprocessors.h"
 #include "usart0.h"
 
-static char * data;
+static char serial_buffer[100];
+static char * buffer_pointer;
 
 void USART0_Init(unsigned int ubrr)
 {
@@ -26,8 +27,8 @@ void USART0_Init(unsigned int ubrr)
 	//-----Control Register UCSRnB---//
 	CLEAR_BIT(UCSR0B, UCSZ02);			/*Data length is 8 bit*/
 	CLEAR_BIT(UCSR0B, RXEN0);			/*Disabled USART0 Receiver*/
-	SET_BIT(UCSR0B, UDRIE0);			/*Enabled - Data Buffer Empty Interrupt*/
-	SET_BIT(UCSR0B, TXCIE0);			/*Enabled - Data transmission completed Interrupt*/
+	CLEAR_BIT(UCSR0B, UDRIE0);			/*Disabled - Data Buffer Empty Interrupt*/
+	CLEAR_BIT(UCSR0B, TXCIE0);			/*Disabled - Data transmission completed Interrupt*/
 	CLEAR_BIT(UCSR0B, RXCIE0);			/*Disabled - Data receive completed Interrupt*/
 
 	//-----Control Register UCSRnC---//
@@ -43,21 +44,32 @@ void USART0_Init(unsigned int ubrr)
 	CLEAR_BIT(UCSR0B, UMSEL00);			/*Mode - Async Mode*/
 	CLEAR_BIT(UCSR0B, UMSEL01);			/*Mode - Async Mode*/
 
+	//-------Make Register Ready-----//
+	UDR0 = '\0';						/*Clear Transmit Register*/
+
 	//-------Turn On Transmitter-----//
 	SET_BIT(UCSR0B, TXEN0);				/*Enabled USART0 Transmitter*/
 }
 
-void USART0_Send_Data(char * _data)
+void USART0_Send_Data( register char * _data)
 {
-	data = _data;
+	register uint8_t i = 0;
+	while(*_data != '\0')				/*Load data to serial_buffer*/
+	{
+		serial_buffer[i++] = *(_data++);
+	}
+	serial_buffer[i] = '\n';
+	buffer_pointer = serial_buffer;		/*Set serial buffer pointer*/
+
 	SET_BIT(UCSR0B, UDRIE0);			/*Enabled - Data Buffer Empty Interrupt*/
+	SET_BIT(UCSR0B, TXCIE0);			/*Enabled - Data transmission completed Interrupt*/
 }
 
 ISR(USART_UDRE_vect)
 {
-	if(*data != '\0')
+	if(*buffer_pointer != '\n')
 	{
-		UDR0 = *(data++);				/*Load Next Data Byte*/
+		UDR0 = *(buffer_pointer++);		/*Load Next Data Byte*/
 	}
 	else
 	{
@@ -71,5 +83,7 @@ ISR(USART_TX_vect)
 	/* The TXCn Flag bit is automatically cleared,
 	 * when a transmit complete interrupt is executed
 	 */
+
+	CLEAR_BIT(UCSR0B, TXCIE0);			/*Disabled - Data transmission completed Interrupt*/
 }
 

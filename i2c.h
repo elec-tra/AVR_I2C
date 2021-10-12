@@ -7,7 +7,6 @@
 #ifndef I2C_H_
 #define I2C_H_
 
-char debug_message[20];
 char data_buffer[19];
 
 //-----Function Declarations------//
