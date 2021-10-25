@@ -12,6 +12,16 @@
 static char serial_buffer[100];
 static char * buffer_pointer;
 
+/*
+ * Function: Initialize USART0 Peripheral
+ * --------------------------------------
+ * Set and Configure registers of USART0
+ * peripheral for serial transmission only.
+ *
+ * ubrr: Contains desired baud rate for user.
+ *
+ * returns: It returns nothing.
+ */
 void USART0_Init(unsigned int ubrr)
 {
 	//---------Set baud rate---------//
@@ -51,6 +61,18 @@ void USART0_Init(unsigned int ubrr)
 	SET_BIT(UCSR0B, TXEN0);				/*Enabled USART0 Transmitter*/
 }
 
+/*
+ * Function: Setup USART0 Peripheral for Transmission
+ * --------------------------------------------------
+ * Copies incoming character array to a dedicated
+ * serial buffer.
+ * Data Buffer Empty Interrupt is Enabled.
+ * Data transmission completed Interrupt is Enabled.
+ *
+ * * _data: Pointer to incoming character array.
+ *
+ * returns: It returns nothing.
+ */
 void USART0_Send_Data( register char * _data)
 {
 	register uint8_t i = 0;
@@ -65,6 +87,16 @@ void USART0_Send_Data( register char * _data)
 	SET_BIT(UCSR0B, TXCIE0);			/*Enabled - Data transmission completed Interrupt*/
 }
 
+/*
+ * Function: ISR for USART0 Transmit data register is empty
+ * --------------------------------------------------------
+ * This Interrupt Sub-Routine executed when USART0 transmit
+ * data register is empty.
+ * Disables data buffer empty interrupt after all bytes are
+ * transmitted.
+ *
+ * retuns: It returns nothing.
+ */
 ISR(USART_UDRE_vect)
 {
 	if(*buffer_pointer != '\n')
@@ -78,6 +110,16 @@ ISR(USART_UDRE_vect)
 	}
 }
 
+/*
+ * Function: ISR for USART0 Transmit shift register is empty
+ * ---------------------------------------------------------
+ * This Interrupt Sub-Routine executed when USART0 transmit
+ * shift register is empty.
+ * Disables data transmission completed interrupt after all
+ * bytes are transmitted.
+ *
+ * retuns: It returns nothing.
+ */
 ISR(USART_TX_vect)
 {
 	/* The TXCn Flag bit is automatically cleared,
@@ -86,4 +128,3 @@ ISR(USART_TX_vect)
 
 	CLEAR_BIT(UCSR0B, TXCIE0);			/*Disabled - Data transmission completed Interrupt*/
 }
-
